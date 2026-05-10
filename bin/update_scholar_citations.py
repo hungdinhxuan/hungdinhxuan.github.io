@@ -3,8 +3,11 @@
 import os
 import sys
 import yaml
+import json
 from datetime import datetime
-from scholarly import scholarly
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlencode
+from urllib.request import urlopen
 
 
 def load_scholar_user_id() -> str:
@@ -34,6 +37,37 @@ def load_scholar_user_id() -> str:
 
 SCHOLAR_USER_ID: str = load_scholar_user_id()
 OUTPUT_FILE: str = "_data/citations.yml"
+SERPAPI_ENDPOINT: str = "https://serpapi.com/search.json"
+
+
+def load_serpapi_key() -> str:
+    api_key = os.environ.get("SERPAPI_API_KEY") or os.environ.get("SERPAPI_KEY")
+    if not api_key:
+        print("Missing SERPAPI_API_KEY. Add it as a GitHub Actions secret.")
+        sys.exit(1)
+    return api_key
+
+
+def serpapi_get(params: dict[str, str]) -> dict:
+    query = urlencode(params)
+    try:
+        with urlopen(f"{SERPAPI_ENDPOINT}?{query}", timeout=45) as response:
+            data = json.loads(response.read().decode("utf-8"))
+    except HTTPError as e:
+        print(f"SerpApi request failed with HTTP {e.code}: {e.reason}")
+        sys.exit(1)
+    except URLError as e:
+        print(f"SerpApi request failed: {e.reason}")
+        sys.exit(1)
+
+    if data.get("error"):
+        print(f"SerpApi error: {data['error']}")
+        sys.exit(1)
+    if data.get("search_metadata", {}).get("status") == "Error":
+        print("SerpApi search failed.")
+        sys.exit(1)
+
+    return data
 
 
 def get_scholar_citations() -> None:
@@ -62,16 +96,16 @@ def get_scholar_citations() -> None:
 
     citation_data = {"metadata": {"last_updated": today}, "papers": {}}
 
-    scholarly.set_timeout(15)
-    scholarly.set_retries(3)
-    try:
-        author = scholarly.search_author_id(SCHOLAR_USER_ID)
-        author_data = scholarly.fill(author)
-    except Exception as e:
-        print(
-            f"Error fetching author data from Google Scholar for user ID '{SCHOLAR_USER_ID}': {e}. Please check your internet connection and Scholar user ID."
-        )
-        sys.exit(1)
+    author_data = serpapi_get(
+        {
+            "engine": "google_scholar_author",
+            "author_id": SCHOLAR_USER_ID,
+            "hl": "en",
+            "sort": "pubdate",
+            "num": "100",
+            "api_key": load_serpapi_key(),
+        }
+    )
 
     if not author_data:
         print(
@@ -79,22 +113,22 @@ def get_scholar_citations() -> None:
         )
         sys.exit(1)
 
-    if "publications" not in author_data:
+    if "articles" not in author_data:
         print(f"No publications found in author data for user ID '{SCHOLAR_USER_ID}'.")
         sys.exit(1)
 
-    for pub in author_data["publications"]:
+    for article in author_data["articles"]:
         try:
-            pub_id = pub.get("pub_id") or pub.get("author_pub_id")
+            pub_id = article.get("citation_id")
             if not pub_id:
                 print(
-                    f"Warning: No ID found for publication: {pub.get('bib', {}).get('title', 'Unknown')}. This publication will be skipped."
+                    f"Warning: No ID found for publication: {article.get('title', 'Unknown')}. This publication will be skipped."
                 )
                 continue
 
-            title = pub.get("bib", {}).get("title", "Unknown Title")
-            year = pub.get("bib", {}).get("pub_year", "Unknown Year")
-            citations = pub.get("num_citations", 0)
+            title = article.get("title", "Unknown Title")
+            year = article.get("year", "Unknown Year")
+            citations = article.get("cited_by", {}).get("value", 0)
 
             print(f"Found: {title} ({year}) - Citations: {citations}")
 
@@ -105,7 +139,7 @@ def get_scholar_citations() -> None:
             }
         except Exception as e:
             print(
-                f"Error processing publication '{pub.get('bib', {}).get('title', 'Unknown')}': {e}. This publication will be skipped."
+                f"Error processing publication '{article.get('title', 'Unknown')}': {e}. This publication will be skipped."
             )
 
     # Compare new data with existing data

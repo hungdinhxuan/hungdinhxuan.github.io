@@ -24,6 +24,7 @@ jobs:
     env:
       FORCE_SOURCE_DATE: "1"
       SOURCE_DATE_EPOCH: "0"
+      SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
       TZ: UTC
 
     steps:

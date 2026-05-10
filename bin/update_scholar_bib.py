@@ -1,20 +1,29 @@
 #!/usr/bin/env python3
 
-"""Append new Google Scholar publications to the LaTeX CV BibTeX file."""
+"""Append new Google Scholar publications to the LaTeX CV BibTeX file.
+
+Uses SerpApi's Google Scholar Author API instead of direct Google Scholar
+scraping, which is frequently blocked in CI.
+"""
 
 from __future__ import annotations
 
+import json
+import os
 import re
 import sys
 from pathlib import Path
 from typing import Iterable
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlencode
+from urllib.request import urlopen
 
 import yaml
-from scholarly import scholarly
 
 
 SOCIALS_FILE = Path("_data/socials.yml")
 BIB_FILE = Path("cv_latex/own-bib.bib")
+SERPAPI_ENDPOINT = "https://serpapi.com/search.json"
 
 
 def load_scholar_user_id() -> str:
@@ -28,6 +37,13 @@ def load_scholar_user_id() -> str:
         sys.exit(f"Missing scholar_userid in {SOCIALS_FILE}.")
 
     return str(scholar_user_id)
+
+
+def load_serpapi_key() -> str:
+    api_key = os.environ.get("SERPAPI_API_KEY") or os.environ.get("SERPAPI_KEY")
+    if not api_key:
+        sys.exit("Missing SERPAPI_API_KEY. Add it as a GitHub Actions secret.")
+    return api_key
 
 
 def normalize_title(title: str) -> str:
@@ -73,12 +89,12 @@ def make_key(title: str, year: str, used_keys: set[str]) -> str:
     return key
 
 
-def make_minimal_bibtex(pub: dict, used_keys: set[str]) -> str:
-    bib = pub.get("bib", {})
-    title = str(bib.get("title", "Untitled"))
-    year = str(bib.get("pub_year", bib.get("year", "")))
-    venue = str(bib.get("venue", bib.get("journal", bib.get("conference", ""))))
-    authors = str(bib.get("author", ""))
+def make_minimal_bibtex(article: dict, used_keys: set[str]) -> str:
+    title = str(article.get("title", "Untitled"))
+    year = str(article.get("year", ""))
+    venue = str(article.get("publication", ""))
+    authors = str(article.get("authors", ""))
+    link = str(article.get("link", ""))
     key = make_key(title, year, used_keys)
 
     lines = [f"@inproceedings{{{key},"]
@@ -89,53 +105,55 @@ def make_minimal_bibtex(pub: dict, used_keys: set[str]) -> str:
         lines.append(f"  booktitle = {{{latex_escape(venue)}}},")
     if year:
         lines.append(f"  year = {{{latex_escape(year)}}},")
+    if link:
+        lines.append(f"  url = {{{latex_escape(link)}}},")
     lines.append("}")
     return "\n".join(lines)
 
 
-def scholar_publications(scholar_user_id: str) -> Iterable[dict]:
-    scholarly.set_timeout(20)
-    scholarly.set_retries(3)
-    author = scholarly.search_author_id(scholar_user_id)
-    author = scholarly.fill(author, sections=["publications"])
-    publications = author.get("publications", [])
-    return sorted(
-        publications,
-        key=lambda pub: int(pub.get("bib", {}).get("pub_year", 0) or 0),
-        reverse=True,
-    )
-
-
-def bibtex_for_publication(pub: dict, used_keys: set[str]) -> str:
+def serpapi_get(params: dict[str, str]) -> dict:
+    query = urlencode(params)
     try:
-        filled_pub = scholarly.fill(pub)
-        bibtex = scholarly.bibtex(filled_pub).strip()
-        key_match = re.match(r"(@\w+\s*\{\s*)([^,\s]+)", bibtex)
-        if key_match:
-            key = key_match.group(2)
-            if key in used_keys:
-                title = filled_pub.get("bib", {}).get("title", key)
-                year = str(filled_pub.get("bib", {}).get("pub_year", ""))
-                new_key = make_key(title, year, used_keys)
-                bibtex = bibtex.replace(key_match.group(0), f"{key_match.group(1)}{new_key}", 1)
-            else:
-                used_keys.add(key)
-        return bibtex
-    except Exception as exc:
-        print(f"Warning: falling back to minimal BibTeX for {pub.get('bib', {}).get('title', 'unknown')}: {exc}")
-        return make_minimal_bibtex(pub, used_keys)
+        with urlopen(f"{SERPAPI_ENDPOINT}?{query}", timeout=45) as response:
+            data = json.loads(response.read().decode("utf-8"))
+    except HTTPError as exc:
+        sys.exit(f"SerpApi request failed with HTTP {exc.code}: {exc.reason}")
+    except URLError as exc:
+        sys.exit(f"SerpApi request failed: {exc.reason}")
+
+    if data.get("error"):
+        sys.exit(f"SerpApi error: {data['error']}")
+    if data.get("search_metadata", {}).get("status") == "Error":
+        sys.exit("SerpApi search failed.")
+
+    return data
+
+
+def scholar_publications(scholar_user_id: str, api_key: str) -> Iterable[dict]:
+    data = serpapi_get(
+        {
+            "engine": "google_scholar_author",
+            "author_id": scholar_user_id,
+            "hl": "en",
+            "sort": "pubdate",
+            "num": "100",
+            "api_key": api_key,
+        }
+    )
+    return data.get("articles", [])
 
 
 def main() -> int:
     scholar_user_id = load_scholar_user_id()
+    api_key = load_serpapi_key()
     current_bib = BIB_FILE.read_text() if BIB_FILE.exists() else ""
     known_titles = existing_titles(current_bib)
     used_keys = existing_keys(current_bib)
     new_entries: list[str] = []
 
-    print(f"Fetching Google Scholar publications for {scholar_user_id}")
-    for pub in scholar_publications(scholar_user_id):
-        title = str(pub.get("bib", {}).get("title", "")).strip()
+    print(f"Fetching Google Scholar publications for {scholar_user_id} via SerpApi")
+    for article in scholar_publications(scholar_user_id, api_key):
+        title = str(article.get("title", "")).strip()
         if not title:
             continue
 
@@ -145,7 +163,7 @@ def main() -> int:
             continue
 
         print(f"Adding new publication: {title}")
-        new_entries.append(bibtex_for_publication(pub, used_keys))
+        new_entries.append(make_minimal_bibtex(article, used_keys))
         known_titles.add(normalized)
 
     if not new_entries:
