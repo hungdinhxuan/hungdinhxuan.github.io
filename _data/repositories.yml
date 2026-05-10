@@ -1,14 +1,11 @@
 github_users:
-  - torvalds
-  - alshedivat
+  - hungdinhxuan
 
 repo_description_lines_max: 2
 
 github_repos:
-  - alshedivat/al-folio
-  - jekyll/jekyll
-  - twbs/bootstrap
-  - jquery/jquery
-  - FortAwesome/Font-Awesome
-  - mathjax/MathJax
-  - jpswalsh/academicons
+  - hungdinhxuan/real-time-deepfake-speech-detection
+  - hungdinhxuan/A-REAL-TIME-AUDIO-DEEPFAKE-DETECTION-ON-LIMITED-RESOURCES-DEVICES
+  - hungdinhxuan/StreamingFakeSpeechDetection
+  - hungdinhxuan/Lightning-hydra-ADD
+  - hungdinhxuan/airflow-mlops-dags

@@ -1,0 +1,74 @@
+name: Update Scholar BibTeX and CV PDF
+
+on:
+  schedule:
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - "_data/socials.yml"
+      - "bin/update_scholar_bib.py"
+      - "requirements.txt"
+      - "cv_latex/**"
+      - ".github/workflows/update-scholar-bib-and-cv.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  update-bib-and-render-cv:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_SOURCE_DATE: "1"
+      SOURCE_DATE_EPOCH: "0"
+      TZ: UTC
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Update Scholar BibTeX
+        run: python bin/update_scholar_bib.py
+
+      - name: Compile LaTeX CV
+        uses: xu-cheng/latex-action@v3
+        with:
+          working_directory: cv_latex
+          root_file: cv-llt.tex
+          latexmk_use_xelatex: false
+          args: -pdf -interaction=nonstopmode -file-line-error -halt-on-error
+
+      - name: Publish CV PDF
+        run: |
+          mkdir -p assets/pdf
+          cp cv_latex/cv-llt.pdf cv_latex/new-cv.pdf
+          cp cv_latex/cv-llt.pdf assets/pdf/new-cv.pdf
+
+      - name: Upload CV PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: new-cv
+          path: assets/pdf/new-cv.pdf
+
+      - name: Commit updated bibliography and CV
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add cv_latex/own-bib.bib cv_latex/new-cv.pdf assets/pdf/new-cv.pdf
+          git diff --staged --quiet || (
+            git commit -m "chore: update Scholar bibliography and CV PDF"
+            git push
+          )
