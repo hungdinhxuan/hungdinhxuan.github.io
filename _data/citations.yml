@@ -1,12 +1,12 @@
 metadata:
-  last_updated: '2026-05-10'
+  last_updated: '2026-05-11'
 papers:
   GqijLfkAAAAJ:5nxA0vEk-isC:
-    citations: 0
+    citations: null
     title: Dynamic Noise-Aware Multi Lora Framework Towards Real-World Audio Deepfake Detection
     year: '2026'
   GqijLfkAAAAJ:8k81kl-MbHgC:
-    citations: 0
+    citations: null
     title: 'Robust SASV System in Real-World Scenarios: A Fusion Approach for the WildSpoof Challenge'
     year: '2026'
   GqijLfkAAAAJ:UebtZRa9Y70C:
@@ -14,7 +14,7 @@ papers:
     title: Towards real-time audio deepfake detection in resource-limited environments
     year: '2024'
   GqijLfkAAAAJ:hqOjcs7Dif8C:
-    citations: 3
+    citations: 4
     title: 'Defending Speaker Verification Against Deepfake: A Multi-Step Approach'
     year: '2025'
   GqijLfkAAAAJ:ufrVoPGSRksC:
