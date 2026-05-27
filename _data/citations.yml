@@ -1,5 +1,5 @@
 metadata:
-  last_updated: '2026-05-11'
+  last_updated: '2026-05-27'
 papers:
   GqijLfkAAAAJ:5nxA0vEk-isC:
     citations: null
@@ -18,6 +18,6 @@ papers:
     title: 'Defending Speaker Verification Against Deepfake: A Multi-Step Approach'
     year: '2025'
   GqijLfkAAAAJ:ufrVoPGSRksC:
-    citations: 18
+    citations: 19
     title: 'Trident of poseidon: A generalized approach for detecting deepfake voices'
     year: '2024'
