@@ -1,5 +1,5 @@
 metadata:
-  last_updated: '2026-08-03'
+  last_updated: '2026-08-07'
 papers:
   GqijLfkAAAAJ:5nxA0vEk-isC:
     citations: 1
@@ -10,7 +10,7 @@ papers:
     title: 'Robust SASV System in Real-World Scenarios: A Fusion Approach for the WildSpoof Challenge'
     year: '2026'
   GqijLfkAAAAJ:UebtZRa9Y70C:
-    citations: 4
+    citations: 5
     title: Towards real-time audio deepfake detection in resource-limited environments
     year: '2024'
   GqijLfkAAAAJ:hqOjcs7Dif8C:
@@ -18,6 +18,6 @@ papers:
     title: 'Defending speaker verification against deepfake: A multi-step approach'
     year: '2025'
   GqijLfkAAAAJ:ufrVoPGSRksC:
-    citations: 21
+    citations: 23
     title: 'Trident of poseidon: A generalized approach for detecting deepfake voices'
     year: '2024'
