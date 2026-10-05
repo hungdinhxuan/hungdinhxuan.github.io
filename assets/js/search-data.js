@@ -439,7 +439,7 @@ ninja.data = [{
         title: 'CV',
         section: 'Socials',
         handler: () => {
-          window.open("/assets/pdf/new-cv.pdf", "_blank");
+          window.open("/assets/rendercv/rendercv_output/Dinh_Xuan_Hung_CV.pdf", "_blank");
         },
       },{
         id: 'social-email',
