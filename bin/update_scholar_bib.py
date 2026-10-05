@@ -74,6 +74,12 @@ def latex_escape(value: str) -> str:
     return "".join(replacements.get(char, char) for char in value)
 
 
+def format_authors(authors: str) -> str:
+    """Convert SerpApi's comma-separated author list to BibLaTeX syntax."""
+    names = [name.strip() for name in authors.split(",") if name.strip()]
+    return " and ".join(names)
+
+
 def make_key(title: str, year: str, used_keys: set[str]) -> str:
     words = re.findall(r"[a-z0-9]+", title.lower())
     base = "".join(words[:4]) or "scholarpub"
@@ -99,7 +105,7 @@ def make_minimal_bibtex(article: dict, used_keys: set[str]) -> str:
 
     lines = [f"@inproceedings{{{key},"]
     if authors:
-        lines.append(f"  author = {{{latex_escape(authors)}}},")
+        lines.append(f"  author = {{{latex_escape(format_authors(authors))}}},")
     lines.append(f"  title = {{{latex_escape(title)}}},")
     if venue:
         lines.append(f"  booktitle = {{{latex_escape(venue)}}},")
