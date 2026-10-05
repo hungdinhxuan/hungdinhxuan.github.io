@@ -17,7 +17,7 @@ cv:
       - institution: Soongsil University
         location: Seoul, Korea
         area: Performance Optimization for On-Device Audio Deepfake Detection
-        studyType: M.Sc.
+        degree: "Master of Science (M.Sc.)"
         start_date: "2023"
         end_date: "2025"
         highlights:
@@ -26,7 +26,7 @@ cv:
       - institution: University of Information Technology - VNUHCM
         location: Ho Chi Minh City, Vietnam
         area: Engineering
-        studyType: B.Eng.
+        degree: "Bachelor of Engineering (B.Eng.)"
         start_date: "2018"
         end_date: "2023"
         highlights:
@@ -111,17 +111,20 @@ cv:
         url: https://doi.org/10.1145/3658644.3690311
 
     Skills:
-      - name: Research
-        level: Advanced
-        keywords: "Audio Deepfake Detection, Speaker Verification, Anti-Spoofing, On-Device Machine Learning"
+      - label: Coding
+        details: "Python, C#, JavaScript, Java, SQL, LaTeX"
 
-      - name: Programming
-        level: Advanced
-        keywords: "Python, C#, JavaScript, Java, SQL, LaTeX"
+      - label: Research
+        details: "Audio deepfake detection, speaker verification, anti-spoofing, on-device machine learning"
 
-      - name: Web and Data
-        level: Intermediate
-        keywords: "HTML, CSS, MySQL, PostgreSQL, SQLite"
+      - label: Databases
+        details: "MySQL, PostgreSQL, SQLite"
+
+      - label: Web Development
+        details: "HTML, CSS, JavaScript, Apache Web Server, Tomcat Web Server"
+
+      - label: Additional
+        details: "Academic research, LaTeX typesetting and publishing"
 
     Languages:
       - name: Vietnamese
