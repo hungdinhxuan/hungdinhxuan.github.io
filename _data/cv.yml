@@ -1,5 +1,5 @@
 cv:
-  name: Dinh Xuan Hung
+  name: Hung Dinh-Xuan
   email: hungdx@soongsil.ac.kr
   location: Seoul, Korea
   website: https://hungdx.com/
@@ -36,7 +36,7 @@ cv:
       - company: AI Security Research Center, Soongsil University
         position: Researcher
         location: Seoul, Korea
-        start_date: "2025"
+        start_date: "2025-09"
         end_date: present
         highlights:
           - Researching audio deepfake detection, anti-spoofing, and speaker verification in real-world conditions.
@@ -52,7 +52,7 @@ cv:
     Publications:
       - title: "Robust SASV System in Real-World Scenarios: A Fusion Approach for the WildSpoof Challenge"
         authors:
-          - Dinh-Xuan Hung
+          - "**Hung Dinh-Xuan**"
           - Seongkyu Han
           - Woongjae Lee
           - Yowon Lee
@@ -67,7 +67,7 @@ cv:
       - title: "Dynamic Noise-Aware Multi Lora Framework Towards Real-World Audio Deepfake Detection"
         authors:
           - Woongjae Lee
-          - Dinh-Xuan Hung
+          - "**Hung Dinh-Xuan**"
           - Thien-Phuc Doan
           - Souhwan Jung
         publisher: ICASSP 2026
@@ -77,7 +77,7 @@ cv:
       - title: "Defending Speaker Verification Against Deepfake: A Multi-Step Approach"
         authors:
           - Thien-Phuc Doan
-          - Dinh-Xuan Hung
+          - "**Hung Dinh-Xuan**"
           - Inho Kim
           - Woongjae Lee
           - SeongKyu Han
@@ -88,7 +88,7 @@ cv:
 
       - title: Towards Real-Time Audio Deepfake Detection in Resource-Limited Environments
         authors:
-          - Dinh-Xuan Hung
+          - "**Hung Dinh-Xuan**"
           - Thien-Phuc Doan
           - Sungkyu Han
           - Kihun Hong
@@ -100,7 +100,7 @@ cv:
       - title: "Trident of Poseidon: A Generalized Approach for Detecting Deepfake Voices"
         authors:
           - Thien-Phuc Doan
-          - Dinh-Xuan Hung
+          - "**Hung Dinh-Xuan**"
           - Taewon Ryu
           - Inho Kim
           - Woongjae Lee
@@ -129,12 +129,3 @@ cv:
 
       - name: English
         summary: Professional proficiency
-
-    Projects:
-      - name: real-time-deepfake-speech-detection
-        url: https://github.com/hungdinhxuan/real-time-deepfake-speech-detection
-        summary: Implementation for real-time deepfake speech detection in resource-limited environments.
-
-      - name: StreamingFakeSpeechDetection
-        url: https://github.com/hungdinhxuan/StreamingFakeSpeechDetection
-        summary: Streaming-oriented fake speech detection project.
