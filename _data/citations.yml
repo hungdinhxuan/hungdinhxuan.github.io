@@ -1,5 +1,5 @@
 metadata:
-  last_updated: '2026-10-14'
+  last_updated: '2026-10-19'
 papers:
   GqijLfkAAAAJ:3fE2CSJIrl8C:
     citations: null
@@ -18,10 +18,10 @@ papers:
     title: Towards real-time audio deepfake detection in resource-limited environments
     year: '2024'
   GqijLfkAAAAJ:hqOjcs7Dif8C:
-    citations: 5
+    citations: 6
     title: 'Defending speaker verification against deepfake: A multi-step approach'
     year: '2025'
   GqijLfkAAAAJ:ufrVoPGSRksC:
-    citations: 25
+    citations: 26
     title: 'Trident of poseidon: A generalized approach for detecting deepfake voices'
     year: '2024'
